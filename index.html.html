@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Exotics 3 Frontières — Carte Fidélité</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#2E8B2E;--gd:#1a5e1a;--gl:#e8f5e8;
+  --y:#F5D000;--yd:#b89e00;--yl:#fffbe6;
+  --bg:#f4f6f3;--sur:#fff;--bor:rgba(0,0,0,0.11);
+  --tx:#1a1a1a;--mu:#666;--rad:12px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;background:var(--bg);color:var(--tx);min-height:100vh}
+
+/* ── BANNER ── */
+.banner{background:var(--g);border-radius:0 0 18px 18px;padding:0;overflow:hidden;margin-bottom:16px;position:relative}
+.banner-inner{display:flex;align-items:center;gap:0;min-height:90px}
+.banner-img{width:110px;min-height:90px;object-fit:cover;flex-shrink:0;opacity:.85}
+.banner-text{padding:14px 16px;flex:1}
+.banner-logo{font-size:19px;font-weight:700;color:var(--y);line-height:1.1;letter-spacing:.3px}
+.banner-sub{font-size:11px;color:rgba(255,255,255,.82);margin-top:3px;line-height:1.4}
+.banner-badge{position:absolute;top:10px;right:12px;background:rgba(245,208,0,.18);border:1px solid rgba(245,208,0,.4);border-radius:99px;padding:3px 11px;font-size:11px;font-weight:600;color:var(--y)}
+
+/* ── LAYOUT ── */
+.wrap{max-width:700px;margin:0 auto;padding:0 .9rem 3rem}
+.tabs{display:flex;gap:7px;margin-bottom:14px}
+.tab{flex:1;padding:9px 4px;border:1px solid #ccc;border-radius:9px;background:#fff;cursor:pointer;font-size:13px;font-weight:600;color:#666;transition:.15s}
+.tab.on{background:var(--g);color:#fff;border-color:var(--g)}
+.tab:hover:not(.on){background:var(--gl)}
+.pane{display:none}.pane.on{display:block}
+
+/* ── CARDS / BOXES ── */
+.box{background:#fff;border:1px solid var(--bor);border-radius:var(--rad);padding:16px;margin-bottom:12px}
+.boxtitle{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:13px;padding-bottom:9px;border-bottom:1px solid var(--bor)}
+.row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.fg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px}
+.fg label{font-size:12px;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.fg input{padding:9px 11px;border:1px solid #ccc;border-radius:8px;background:#fff;color:var(--tx);font-size:14px;width:100%}
+.fg input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 3px rgba(46,139,46,.1)}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 16px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer;font-size:14px;font-weight:600;color:var(--tx);transition:.15s}
+.btn-g{background:var(--g);color:#fff;border-color:var(--g)}.btn-g:hover{background:var(--gd)}
+.btn-y{background:var(--yl);color:var(--gd);border-color:var(--yd)}.btn-y:hover{background:var(--y)}
+.btn-r{border-color:#e24b4a;color:#a32d2d}.btn-r:hover{background:#fff0f0}
+.btn-b{background:#1a73e8;color:#fff;border-color:#1a73e8}.btn-b:hover{background:#1558b0}
+.btn-sm{padding:6px 11px;font-size:12px}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:13px}
+.stat{background:var(--gl);border-radius:9px;padding:11px}
+.stat-l{font-size:11px;color:var(--gd);margin-bottom:3px;font-weight:600;text-transform:uppercase}
+.stat-v{font-size:21px;font-weight:700;color:var(--gd)}
+
+/* ── CLIENT ITEM ── */
+.client-item{border:1px solid var(--bor);border-radius:11px;padding:13px;margin-bottom:9px;background:#fff}
+.ci-top{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.av{width:40px;height:40px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--gd);flex-shrink:0}
+.cname{font-weight:700;font-size:15px;color:var(--tx)}
+.cmeta{font-size:12px;color:var(--mu);margin-top:1px}
+.bdg{display:inline-block;font-size:11px;padding:2px 7px;border-radius:6px;font-weight:700;margin-left:5px}
+.bdg-s{background:#e0e0d8;color:#444}.bdg-o{background:#fde8b0;color:#7a4f00}.bdg-p{background:var(--gl);color:var(--gd)}
+.bar-bg{background:#e5e5e5;border-radius:99px;height:7px;overflow:hidden;margin:5px 0 3px}
+.bar-f{height:100%;border-radius:99px;background:var(--g);transition:width .4s}
+.bar-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--mu)}
+.ci-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;align-items:center}
+.pts-form{display:none;margin-top:9px;padding-top:9px;border-top:1px solid var(--bor)}
+.pts-inline{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.pts-inline input{padding:8px 10px;border:1px solid #ccc;border-radius:8px;font-size:14px;width:115px}
+
+/* ── FIDELITY CARD ── */
+.fcard{background:var(--g);border-radius:16px;padding:20px;color:#fff;margin-bottom:13px;position:relative;overflow:hidden}
+.fcard-deco{position:absolute;border-radius:50%;background:rgba(245,208,0,.1)}
+.fcard-brand{font-size:12px;font-weight:700;color:var(--y);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase}
+.fcard-name{font-size:21px;font-weight:700;margin-bottom:1px}
+.fcard-tel{font-size:12px;opacity:.75;margin-bottom:15px}
+.fcard-pts{font-size:38px;font-weight:800;color:var(--y);line-height:1}
+.fcard-ptslbl{font-size:12px;opacity:.8}
+.fcard-lvl{position:absolute;top:16px;right:16px;background:rgba(245,208,0,.22);border:1px solid rgba(245,208,0,.45);border-radius:99px;padding:3px 11px;font-size:11px;font-weight:700;color:var(--y)}
+
+/* ── HISTORY ── */
+.hist-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bor);font-size:13px}
+.hist-row:last-child{border-bottom:none}
+.plus{color:var(--g);font-weight:700}.minus{color:#e24b4a;font-weight:700}
+
+/* ── REWARDS ── */
+.rwd-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bor)}
+.rwd-row:last-child{border-bottom:none}
+
+/* ── PIN SCREEN ── */
+#pin-screen{position:fixed;inset:0;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:20px}
+#pin-screen h2{color:var(--y);font-size:22px;font-weight:800}
+#pin-screen p{color:rgba(255,255,255,.8);font-size:14px}
+.pin-dots{display:flex;gap:14px;margin:8px 0}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:transparent;transition:.2s}
+.pin-dot.filled{background:#fff;border-color:#fff}
+.pin-pad{display:grid;grid-template-columns:repeat(3,64px);gap:10px}
+.pin-key{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;font-weight:700;cursor:pointer;transition:.15s}
+.pin-key:hover{background:rgba(255,255,255,.28)}
+.pin-key.del{font-size:16px}
+#pin-err{color:#ffd0d0;font-size:13px;min-height:18px}
+.pin-logo{font-size:28px;font-weight:800;color:var(--y);margin-bottom:4px}
+.pin-sub{color:rgba(255,255,255,.7);font-size:12px;margin-bottom:16px}
+
+/* ── QR ── */
+.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 0}
+#qr-canvas canvas,#qr-canvas img{border-radius:8px}
+
+/* ── SCRATCH GAME ── */
+.scratch-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem}
+.scratch-box{background:#fff;border-radius:20px;padding:24px;max-width:380px;width:100%;text-align:center;position:relative}
+.scratch-title{font-size:20px;font-weight:800;color:var(--gd);margin-bottom:4px}
+.scratch-sub{font-size:13px;color:var(--mu);margin-bottom:18px}
+.scratch-card{position:relative;width:280px;height:160px;margin:0 auto 18px;border-radius:14px;overflow:hidden;cursor:crosshair}
+.scratch-prize{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--gl),#fff);z-index:1}
+.scratch-prize-icon{font-size:40px;margin-bottom:6px}
+.scratch-prize-txt{font-size:16px;font-weight:800;color:var(--gd)}
+.scratch-prize-val{font-size:13px;color:var(--mu);margin-top:3px}
+canvas#scratchCanvas{position:absolute;inset:0;z-index:2;border-radius:14px}
+.scratch-btn-close{margin-top:8px}
+.scratch-locked{background:#fff;border-radius:14px;padding:20px;text-align:center;color:var(--mu);font-size:14px}
+.scratch-locked-icon{font-size:36px;margin-bottom:8px}
+
+/* ── MISC ── */
+.empty-msg{text-align:center;color:var(--mu);padding:1.8rem 0;font-size:14px}
+.search-inp{width:100%;padding:9px 12px;border:1px solid #ccc;border-radius:9px;font-size:14px;margin-bottom:13px;background:#fff}
+.search-inp:focus{outline:none;border-color:var(--g)}
+#f-err{color:#e24b4a;font-size:13px;margin-bottom:8px;display:none}
+.confirm-banner{background:var(--gl);border:1px solid var(--g);border-radius:9px;padding:10px 14px;font-size:13px;color:var(--gd);margin-bottom:10px;display:none;font-weight:600}
+.email-section{margin-top:14px;padding-top:14px;border-top:1px solid var(--bor)}
+.tag{display:inline-block;background:#e8f5e8;color:var(--gd);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;margin-right:4px;margin-bottom:4px}
+.logout-btn{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:rgba(255,255,255,.8);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer}
+.logout-btn:hover{background:rgba(255,255,255,.25)}
+</style>
+</head>
+<body>
+
+<!-- PIN SCREEN -->
+<div id="pin-screen">
+  <div class="pin-logo">Exotics 3 Frontières</div>
+  <div class="pin-sub">Interface commerçant</div>
+  <h2>Entrez votre code PIN</h2>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
+  </div>
+  <div id="pin-err"></div>
+  <div class="pin-pad">
+    <button class="pin-key" onclick="pinPress('1')">1</button>
+    <button class="pin-key" onclick="pinPress('2')">2</button>
+    <button class="pin-key" onclick="pinPress('3')">3</button>
+    <button class="pin-key" onclick="pinPress('4')">4</button>
+    <button class="pin-key" onclick="pinPress('5')">5</button>
+    <button class="pin-key" onclick="pinPress('6')">6</button>
+    <button class="pin-key" onclick="pinPress('7')">7</button>
+    <button class="pin-key" onclick="pinPress('8')">8</button>
+    <button class="pin-key" onclick="pinPress('9')">9</button>
+    <button class="pin-key del" onclick="pinDel()">⌫</button>
+    <button class="pin-key" onclick="pinPress('0')">0</button>
+    <button class="pin-key" onclick="pinClear()" style="font-size:13px">✕</button>
+  </div>
+  <p style="margin-top:12px;font-size:12px;opacity:.6">PIN par défaut : 1234</p>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+  <div class="wrap">
+
+    <!-- BANNER -->
+    <div class="banner">
+      <div class="banner-inner">
+        <img class="banner-img" src="https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=220&q=80&fit=crop" alt="épicerie africaine" onerror="this.style.display='none'"/>
+        <div class="banner-text">
+          <div class="banner-logo">Exotics 3 Frontières</div>
+          <div class="banner-sub">Épicerie · Cosmétiques · Gros · Demi-gros · Détail</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Déconnexion</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" onclick="go('commercant',this)">🏪 Commerçant</button>
+      <button class="tab" onclick="go('client',this)">👤 Client</button>
+      <button class="tab" onclick="go('email',this)">📧 Emails</button>
+      <button class="tab" onclick="go('reglages',this)">⚙️ Réglages</button>
+    </div>
+
+    <!-- ══════════ COMMERÇANT ══════════ -->
+    <div class="pane on" id="pane-commercant">
+      <div class="stats">
+        <div class="stat"><div class="stat-l">Clients</div><div class="stat-v" id="s-nb">0</div></div>
+        <div class="stat"><div class="stat-l">Points totaux</div><div class="stat-v" id="s-pts">0</div></div>
+        <div class="stat"><div class="stat-l">Récompenses</div><div class="stat-v" id="s-rwd">0</div></div>
+      </div>
+
+      <div class="box">
+        <div class="boxtitle">➕ Nouveau client</div>
+        <div class="row">
+          <div class="fg"><label>Prénom *</label><input type="text" id="f-prenom" placeholder="Marie"/></div>
+          <div class="fg"><label>Nom *</label><input type="text" id="f-nom" placeholder="Dupont"/></div>
+        </div>
+        <div class="row">
+          <div class="fg"><label>Téléphone</label><input type="tel" id="f-tel" placeholder="06 12 34 56 78"/></div>
+          <div class="fg"><label>Email</label><input type="email" id="f-email" placeholder="client@email.com"/></div>
+        </div>
+        <div class="row">
+          <div class="fg" style="max-width:150px"><label>Points départ</label><input type="number" id="f-pts" value="0" min="0"/></div>
+        </div>
+        <div id="f-err">Veuillez entrer au moins un prénom ou un nom.</div>
+        <div id="f-ok" class="confirm-banner">✅ Client ajouté avec succès !</div>
+        <button class="btn btn-g" onclick="ajouterClient()">Ajouter le client</button>
+      </div>
+
+      <input class="search-inp" type="text" id="s-search" placeholder="🔍 Rechercher un client..." oninput="afficherClients()"/>
+      <div id="liste-clients"></div>
+    </div>
+
+    <!-- ══════════ VUE CLIENT ══════════ -->
+    <div class="pane" id="pane-client">
+      <div class="box" style="margin-bottom:13px">
+        <div class="boxtitle">🔍 Trouver ma carte fidélité</div>
+        <input type="text" id="c-search" style="width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:8px;font-size:14px" placeholder="Mon prénom, nom ou téléphone..." oninput="voirClient()"/>
+      </div>
+      <div id="carte-client"><div class="empty-msg">Entrez votre nom ou téléphone.</div></div>
+    </div>
+
+    <!-- ══════════ EMAILS ══════════ -->
+    <div class="pane" id="pane-email">
+      <div class="box">
+        <div class="boxtitle">📧 Envoyer une offre promotionnelle</div>
+        <div class="fg" style="margin-bottom:10px">
+          <label>Destinataires</label>
+          <select id="email-target" style="padding:9px;border:1px solid #ccc;border-radius:8px;font-size:14px;background:#fff">
+            <option value="all">Tous les clients avec email</option>
+            <option value="100">Clients niveau Argent (100+ pts)</option>
+            <option value="200">Clients niveau Or (200+ pts)</option>
+            <option value="500">Clients niveau Platine (500+ pts)</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:10px">
+          <label>Objet de l'email</label>
+          <input type="text" id="email-sujet" placeholder="Offre spéciale cette semaine chez Exotics 3 Frontières !"/>
+        </div>
+        <div class="fg" style="margin-bottom:12px">
+          <label>Message</label>
+          <textarea id="email-body" rows="5" style="padding:9px;border:1px solid #ccc;border-radius:8px;font-size:14px;resize:vertical;font-family:inherit" placeholder="Bonjour, nous avons une offre spéciale pour vous..."></textarea>
+        </div>
+        <div id="email-preview" style="font-size:13px;color:var(--mu);margin-bottom:10px"></div>
+        <button class="btn btn-b" onclick="envoyerEmails()">📤 Préparer les emails</button>
+      </div>
+
+      <div class="box">
+        <div class="boxtitle">📋 Liste des emails clients</div>
+        <div id="email-list"></div>
+      </div>
+    </div>
+
+    <!-- ══════════ RÉGLAGES ══════════ -->
+    <div class="pane" id="pane-reglages">
+      <div class="box">
+        <div class="boxtitle">🔐 Changer le PIN</div>
+        <div class="row">
+          <div class="fg"><label>Nouveau PIN (4 chiffres)</label><input type="password" id="new-pin" maxlength="4" placeholder="••••"/></div>
+          <div class="fg"><label>Confirmer PIN</label><input type="password" id="conf-pin" maxlength="4" placeholder="••••"/></div>
+        </div>
+        <div id="pin-chg-err" style="color:#e24b4a;font-size:13px;margin-bottom:8px;display:none"></div>
+        <div id="pin-chg-ok" class="confirm-banner">✅ PIN mis à jour !</div>
+        <button class="btn btn-g" onclick="changerPin()">Enregistrer le PIN</button>
+      </div>
+      <div class="box">
+        <div class="boxtitle">💶 Programme de points</div>
+        <div class="fg" style="max-width:200px;margin-bottom:12px">
+          <label>Euros pour 1 point</label>
+          <input type="number" id="r-epp" value="1" min="1" oninput="sauveConfig()"/>
+        </div>
+      </div>
+      <div class="box">
+        <div class="boxtitle">🏆 Niveaux de récompenses</div>
+        <div class="rwd-row"><div><strong>🥈 Argent — 100 pts</strong><div style="font-size:12px;color:var(--mu)">Réduction 5%</div></div></div>
+        <div class="rwd-row"><div><strong>🥇 Or — 200 pts</strong><div style="font-size:12px;color:var(--mu)">Réduction 10%</div></div></div>
+        <div class="rwd-row"><div><strong>💎 Platine — 500 pts</strong><div style="font-size:12px;color:var(--mu)">Produit offert</div></div></div>
+      </div>
+    </div>
+
+  </div><!-- /wrap -->
+</div><!-- /app -->
+
+<!-- ══════ QR MODAL ══════ -->
+<div id="qr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:18px;padding:24px;text-align:center;max-width:320px;width:90%">
+    <div style="font-size:17px;font-weight:700;margin-bottom:4px" id="qr-name"></div>
+    <div style="font-size:13px;color:var(--mu);margin-bottom:14px" id="qr-pts-info"></div>
+    <div id="qr-canvas" class="qr-wrap"></div>
+    <p style="font-size:12px;color:var(--mu);margin:10px 0">Scannez pour accéder à la carte fidélité</p>
+    <button class="btn btn-sm" onclick="closeQR()">Fermer</button>
+  </div>
+</div>
+
+<!-- ══════ SCRATCH MODAL ══════ -->
+<div id="scratch-modal" style="display:none" class="scratch-overlay">
+  <div class="scratch-box">
+    <div class="scratch-title">🎰 Carte à Gratter</div>
+    <div class="scratch-sub" id="scratch-sub">Grattez pour découvrir votre gain !</div>
+    <div class="scratch-card" id="scratch-container">
+      <div class="scratch-prize" id="scratch-prize">
+        <div class="scratch-prize-icon" id="sp-icon">🎁</div>
+        <div class="scratch-prize-txt" id="sp-txt">Chargement...</div>
+        <div class="scratch-prize-val" id="sp-val"></div>
+      </div>
+      <canvas id="scratchCanvas" width="280" height="160"></canvas>
+    </div>
+    <div id="scratch-reveal" style="display:none;margin-bottom:12px">
+      <div style="font-size:22px;font-weight:800;color:var(--gd)" id="scratch-win-txt"></div>
+      <div style="font-size:13px;color:var(--mu);margin-top:4px" id="scratch-win-sub"></div>
+    </div>
+    <button class="btn btn-g" onclick="closeScratch()">Fermer</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+let C=[],cfg={epp:1,pin:'1234'},rwdCount=0;
+
+const PRODUCTS=[
+  {n:'Plantain Tournant Jaune',e:'🍌',p:2.87},
+  {n:'Piment Frais en Vrac',e:'🌶️',p:12.90},
+  {n:'Gombo Frais',e:'🫛',p:10.27},
+  {n:'Chips Plantain',e:'🍟',p:1.02},
+  {n:'Attiéké Frais',e:'🍚',p:2.38},
+  {n:'Arachide Fraîche',e:'🥜',p:5.33},
+  {n:'Bobolo',e:'🟤',p:4.82},
+  {n:'Safou',e:'🫐',p:12.27},
+  {n:'Bar du Sénégal',e:'🐟',p:12.51},
+  {n:'Manioc Frais',e:'🥔',p:4.23},
+  {n:'Petit Cola',e:'🌰',p:1.84},
+  {n:'Chinchard / Yoya',e:'🐠',p:10.32},
+  {n:'Igname Blanc Ghana',e:'🥕',p:4.41},
+  {n:'Aubergine Blanche',e:'🍆',p:5.72},
+  {n:'Plantain Vert',e:'🍌',p:3.04},
+  {n:'Piment Antillais Fort',e:'🌶️',p:4.21},
+  {n:'Vimto 33cl',e:'🥤',p:1.34},
+  {n:'Malta Guinness',e:'🍺',p:1.89},
+  {n:'Avocat',e:'🥑',p:4.40},
+  {n:'Jus de Gingembre',e:'🫚',p:2.82},
+  {n:'Maggi au Détail',e:'🧂',p:1.01},
+  {n:'Saka Saka',e:'🥬',p:2.68},
+  {n:'Maquereau 500g+',e:'🐡',p:5.88},
+  {n:'Bobolo Frais',e:'🌿',p:2.91},
+  {n:'Kaolin',e:'🪨',p:0.96},
+  {n:'Chips Plantain Doux',e:'🍟',p:1.04},
+  {n:'Chips Plantain Sucré',e:'🍬',p:1.03},
+  {n:'Sac de Course',e:'🛍️',p:0.30},
+  {n:'Réduction 10%',e:'🏷️',p:0},
+  {n:'Points Bonus x2',e:'⭐',p:0},
+];
+
+// ═══════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════
+function save(){localStorage.setItem('e3c',JSON.stringify(C))}
+function sauveConfig(){
+  cfg.epp=parseInt(document.getElementById('r-epp').value)||1;
+  localStorage.setItem('e3cfg',JSON.stringify(cfg));
+}
+function loadAll(){
+  try{const r=localStorage.getItem('e3c');if(r)C=JSON.parse(r)}catch(e){}
+  try{const r=localStorage.getItem('e3cfg');if(r)cfg=JSON.parse(r)}catch(e){}
+  try{const r=localStorage.getItem('e3rwd');if(r)rwdCount=parseInt(r)||0}catch(e){}
+  document.getElementById('r-epp').value=cfg.epp||1;
+}
+
+// ═══════════════════════════════════════
+// PIN
+// ═══════════════════════════════════════
+let pinVal='';
+function pinPress(d){
+  if(pinVal.length>=4)return;
+  pinVal+=d;
+  updateDots();
+  if(pinVal.length===4)checkPin();
+}
+function pinDel(){pinVal=pinVal.slice(0,-1);updateDots()}
+function pinClear(){pinVal='';updateDots()}
+function updateDots(){
+  for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('filled',i<pinVal.length);
+}
+function checkPin(){
+  if(pinVal===cfg.pin){
+    document.getElementById('pin-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    loadAll();afficherClients();stats();afficherEmails();
+  }else{
+    document.getElementById('pin-err').textContent='Code incorrect, réessayez.';
+    pinVal='';updateDots();
+    setTimeout(()=>document.getElementById('pin-err').textContent='',2000);
+  }
+}
+function logout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('pin-screen').style.display='flex';
+  pinVal='';updateDots();
+}
+function changerPin(){
+  const np=document.getElementById('new-pin').value;
+  const cp=document.getElementById('conf-pin').value;
+  const err=document.getElementById('pin-chg-err');
+  const ok=document.getElementById('pin-chg-ok');
+  if(np.length!==4||!/^\d{4}$/.test(np)){err.textContent='Le PIN doit être 4 chiffres.';err.style.display='block';return}
+  if(np!==cp){err.textContent='Les PINs ne correspondent pas.';err.style.display='block';return}
+  err.style.display='none';
+  cfg.pin=np;sauveConfig();
+  ok.style.display='block';
+  setTimeout(()=>ok.style.display='none',2500);
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function stats(){
+  document.getElementById('s-nb').textContent=C.length;
+  document.getElementById('s-pts').textContent=C.reduce((a,c)=>a+(c.pts||0),0);
+  document.getElementById('s-rwd').textContent=rwdCount;
+}
+function niv(pts){
+  if(pts>=500)return{l:'Platine',cls:'bdg-p',icon:'💎'};
+  if(pts>=200)return{l:'Or',cls:'bdg-o',icon:'🥇'};
+  if(pts>=100)return{l:'Argent',cls:'bdg-s',icon:'🥈'};
+  return{l:'',cls:'',icon:''};
+}
+function nextNiv(pts){
+  if(pts<100)return{t:100,l:'Argent'};
+  if(pts<200)return{t:200,l:'Or'};
+  if(pts<500)return{t:500,l:'Platine'};
+  return null;
+}
+function ini(p,n){return((p||'')[0]||'').toUpperCase()+((n||'')[0]||'').toUpperCase()||'?'}
+function go(name,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pane-'+name).classList.add('on');
+  btn.classList.add('on');
+  if(name==='email')afficherEmails();
+}
+
+// ═══════════════════════════════════════
+// CLIENTS
+// ═══════════════════════════════════════
+function ajouterClient(){
+  const p=document.getElementById('f-prenom').value.trim();
+  const n=document.getElementById('f-nom').value.trim();
+  const err=document.getElementById('f-err');
+  const ok=document.getElementById('f-ok');
+  if(!p&&!n){err.style.display='block';return}
+  err.style.display='none';
+  const pts=parseInt(document.getElementById('f-pts').value)||0;
+  const cl={
+    id:Date.now()+'',prenom:p,nom:n,
+    tel:document.getElementById('f-tel').value.trim(),
+    email:document.getElementById('f-email').value.trim(),
+    pts,hist:[],scratchUsed:false,lastAchat:0
+  };
+  if(pts>0)cl.hist.push({d:new Date().toLocaleDateString('fr-FR'),pts,l:'Départ'});
+  C.push(cl);save();stats();afficherClients();
+  ['f-prenom','f-nom','f-tel','f-email'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-pts').value='0';
+  ok.style.display='block';setTimeout(()=>ok.style.display='none',2500);
+}
+
+function afficherClients(){
+  const q=(document.getElementById('s-search')?.value||'').toLowerCase();
+  const el=document.getElementById('liste-clients');
+  const liste=C.filter(c=>(c.prenom+' '+c.nom).toLowerCase().includes(q)||(c.tel||'').includes(q)||(c.email||'').includes(q));
+  if(!liste.length){el.innerHTML='<div class="empty-msg">Aucun client. Ajoutez le premier !</div>';return}
+  el.innerHTML=liste.map(c=>carteCommerçant(c)).join('');
+}
+
+function carteCommerçant(c){
+  const nv=niv(c.pts);
+  const nx=nextNiv(c.pts);
+  const prev=nx?(nx.t===100?0:nx.t===200?100:200):500;
+  const pct=nx?Math.round(Math.min(((c.pts-prev)/(nx.t-prev))*100,100)):100;
+  const bdg=nv.l?`<span class="bdg ${nv.cls}">${nv.icon} ${nv.l}</span>`:'';
+  return `<div class="client-item" id="ci-${c.id}">
+    <div class="ci-top">
+      <div class="av">${ini(c.prenom,c.nom)}</div>
+      <div style="flex:1">
+        <div class="cname">${c.prenom} ${c.nom}${bdg}</div>
+        <div class="cmeta">${c.tel?c.tel+' · ':''}<b>${c.pts} pts</b>${c.email?' · ✉️ '+c.email:''}</div>
+      </div>
+    </div>
+    <div class="bar-bg"><div class="bar-f" style="width:${pct}%"></div></div>
+    <div class="bar-labels"><span>${c.pts} pts</span><span>${nx?nx.t+' pts ('+nx.l+')':'Niveau max !'}</span></div>
+    <div class="ci-actions">
+      <button class="btn btn-g btn-sm" onclick="togglePts('${c.id}')">+ Points</button>
+      ${c.pts>=100?`<button class="btn btn-y btn-sm" onclick="utiliserRwd('${c.id}')">🏆 Récompense</button>`:''}
+      <button class="btn btn-sm" style="border-color:#1a73e8;color:#1a73e8" onclick="showQR('${c.id}')">📱 QR Code</button>
+      <button class="btn btn-r btn-sm" style="margin-left:auto" onclick="suppClient('${c.id}')">Suppr.</button>
+    </div>
+    <div class="pts-form" id="pts-form-${c.id}">
+      <div class="pts-inline">
+        <div class="fg" style="min-width:0;flex:0 0 125px">
+          <label>Montant achat (€)</label>
+          <input type="number" id="achat-${c.id}" min="0" placeholder="ex: 25" oninput="calcPts('${c.id}')"/>
+        </div>
+        <div style="color:#999;font-size:13px;padding-bottom:9px">OU</div>
+        <div class="fg" style="min-width:0;flex:0 0 110px">
+          <label>Points directs</label>
+          <input type="number" id="manuel-${c.id}" min="0" placeholder="ex: 10"/>
+        </div>
+        <div id="prev-${c.id}" style="font-size:13px;color:var(--g);font-weight:700;padding-bottom:9px"></div>
+        <button class="btn btn-g btn-sm" style="align-self:flex-end" onclick="validerPts('${c.id}')">Valider</button>
+        <button class="btn btn-sm" style="align-self:flex-end" onclick="togglePts('${c.id}')">Annuler</button>
+      </div>
+    </div>
+    ${(c.hist&&c.hist.length)?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bor)">
+      <div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">Historique</div>
+      ${c.hist.slice(0,4).map(h=>`<div class="hist-row"><span>${h.l}</span><div style="display:flex;gap:8px"><span class="${h.pts>0?'plus':'minus'}">${h.pts>0?'+':''}${h.pts} pts</span><span style="font-size:11px;color:var(--mu)">${h.d}</span></div></div>`).join('')}
+    </div>`:''}
+  </div>`;
+}
+
+function togglePts(id){
+  const f=document.getElementById('pts-form-'+id);
+  f.style.display=f.style.display==='none'||f.style.display===''?'block':'none';
+  if(f.style.display==='block')document.getElementById('achat-'+id).focus();
+}
+function calcPts(id){
+  const m=parseFloat(document.getElementById('achat-'+id).value);
+  const epp=cfg.epp||1;
+  document.getElementById('prev-'+id).textContent=(!isNaN(m)&&m>0)?'→ '+Math.round(m/epp)+' pts':'';
+}
+function validerPts(id){
+  const c=C.find(x=>x.id===id);if(!c)return;
+  const m=parseFloat(document.getElementById('achat-'+id).value);
+  const epp=cfg.epp||1;
+  let pts=(!isNaN(m)&&m>0)?Math.round(m/epp):(parseInt(document.getElementById('manuel-'+id).value)||0);
+  if(pts<=0)return;
+  c.pts+=pts;
+  c.lastAchat=(!isNaN(m)&&m>0)?m:0;
+  if(!c.hist)c.hist=[];
+  c.hist.unshift({d:new Date().toLocaleDateString('fr-FR'),pts,l:(!isNaN(m)&&m>0)?'Achat '+m.toFixed(2)+'€':'Ajout manuel'});
+  // Scratch dispo si achat >= 10€
+  if(!isNaN(m)&&m>=10)c.scratchAvail=true;
+  save();stats();afficherClients();
+}
+function utiliserRwd(id){
+  const c=C.find(x=>x.id===id);if(!c)return;
+  const rwds=[{pts:100,l:'Réduction 5%'},{pts:200,l:'Réduction 10%'},{pts:500,l:'Produit offert'}].filter(r=>c.pts>=r.pts);
+  if(!rwds.length)return;
+  const r=rwds[rwds.length-1];
+  if(!confirm('Utiliser "'+r.l+'" pour '+c.prenom+' '+c.nom+' (-'+r.pts+' pts) ?'))return;
+  c.pts-=r.pts;
+  c.hist.unshift({d:new Date().toLocaleDateString('fr-FR'),pts:-r.pts,l:'🏆 Récompense: '+r.l});
+  rwdCount++;localStorage.setItem('e3rwd',String(rwdCount));
+  save();stats();afficherClients();
+}
+function suppClient(id){
+  const c=C.find(x=>x.id===id);
+  if(!confirm('Supprimer '+c.prenom+' '+c.nom+' ?'))return;
+  C=C.filter(x=>x.id!==id);save();stats();afficherClients();
+}
+
+// ═══════════════════════════════════════
+// QR CODE
+// ═══════════════════════════════════════
+function showQR(id){
+  const c=C.find(x=>x.id===id);if(!c)return;
+  document.getElementById('qr-name').textContent=c.prenom+' '+c.nom;
+  document.getElementById('qr-pts-info').textContent=c.pts+' points · '+niv(c.pts).l;
+  const el=document.getElementById('qr-canvas');
+  el.innerHTML='';
+  const url=window.location.href.split('?')[0]+'?client='+id;
+  new QRCode(el,{text:url,width:200,height:200,colorDark:'#1a5e1a',colorLight:'#ffffff'});
+  document.getElementById('qr-modal').style.display='flex';
+}
+function closeQR(){document.getElementById('qr-modal').style.display='none'}
+
+// ═══════════════════════════════════════
+// VUE CLIENT
+// ═══════════════════════════════════════
+function voirClient(){
+  const q=document.getElementById('c-search').value.trim().toLowerCase();
+  const el=document.getElementById('carte-client');
+  if(!q){el.innerHTML='<div class="empty-msg">Entrez votre nom ou numéro de téléphone.</div>';return}
+  const c=C.find(x=>(x.prenom+' '+x.nom).toLowerCase().includes(q)||(x.tel||'').includes(q));
+  if(!c){el.innerHTML='<div class="empty-msg">Aucun client trouvé.</div>';return}
+  const nv=niv(c.pts);
+  const nx=nextNiv(c.pts);
+  const prev=nx?(nx.t===100?0:nx.t===200?100:200):500;
+  const pct=nx?Math.round(Math.min(((c.pts-prev)/(nx.t-prev))*100,100)):100;
+  const hist=(c.hist||[]).slice(0,5);
+  const scratchBtn=c.scratchAvail?`<button class="btn btn-y" style="width:100%;margin-top:12px;font-size:15px" onclick="ouvrirScratch('${c.id}')">🎰 Gratter ma carte !</button>`:'<div style="text-align:center;font-size:13px;color:var(--mu);margin-top:10px;padding:8px;background:#f5f5f5;border-radius:8px">🎰 Jeu à gratter disponible dès 10€ d\'achat</div>';
+  el.innerHTML=`
+    <div class="fcard">
+      <div class="fcard-deco" style="width:120px;height:120px;bottom:-20px;right:-20px"></div>
+      <div class="fcard-deco" style="width:65px;height:65px;bottom:25px;right:45px"></div>
+      <div class="fcard-brand">✦ Exotics 3 Frontières ✦</div>
+      <div class="fcard-name">${c.prenom} ${c.nom}</div>
+      <div class="fcard-tel">${c.tel||'Client fidèle'}${c.email?' · '+c.email:''}</div>
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <div class="fcard-pts">${c.pts}</div>
+        <div class="fcard-ptslbl">points</div>
+      </div>
+      ${nv.l?`<div class="fcard-lvl">${nv.icon} ${nv.l}</div>`:''}
+    </div>
+    <div class="box">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--mu);margin-bottom:6px">
+        <span>Vers ${nx?'niveau '+nx.l:'niveau maximum !'}</span>
+        <span>${c.pts}${nx?' / '+nx.t+' pts':' pts'}</span>
+      </div>
+      <div class="bar-bg"><div class="bar-f" style="width:${pct}%"></div></div>
+      <div style="margin-top:12px">
+        <div class="rwd-row"><span>🥈 100 pts</span><span style="font-size:13px;color:var(--mu)">Réduction 5%</span></div>
+        <div class="rwd-row"><span>🥇 200 pts</span><span style="font-size:13px;color:var(--mu)">Réduction 10%</span></div>
+        <div class="rwd-row"><span>💎 500 pts</span><span style="font-size:13px;color:var(--mu)">Produit offert</span></div>
+      </div>
+      ${scratchBtn}
+    </div>
+    ${hist.length?`<div class="box"><div class="boxtitle" style="margin-bottom:8px">📋 Historique</div>${hist.map(h=>`<div class="hist-row"><span>${h.l}</span><div style="display:flex;gap:8px"><span class="${h.pts>0?'plus':'minus'}">${h.pts>0?'+':''}${h.pts} pts</span><span style="font-size:11px;color:var(--mu)">${h.d}</span></div></div>`).join('')}</div>`:''}
+  `;
+}
+
+// ═══════════════════════════════════════
+// SCRATCH GAME
+// ═══════════════════════════════════════
+let scratchClientId=null;
+function ouvrirScratch(id){
+  const c=C.find(x=>x.id===id);
+  if(!c||!c.scratchAvail)return;
+  scratchClientId=id;
+  // Pick prize based on spend
+  const achat=c.lastAchat||10;
+  const prize=pickPrize(achat);
+  document.getElementById('sp-icon').textContent=prize.icon;
+  document.getElementById('sp-txt').textContent=prize.name;
+  document.getElementById('sp-val').textContent=prize.val;
+  document.getElementById('scratch-sub').textContent='Grattez pour découvrir votre gain !';
+  document.getElementById('scratch-reveal').style.display='none';
+  initScratch();
+  document.getElementById('scratch-modal').style.display='flex';
+}
+function pickPrize(achat){
+  // prizes proportional to spend
+  const roll=Math.random();
+  if(achat>=30){
+    // high spender: more likely product
+    if(roll<0.4)return {icon:PRODUCTS[Math.floor(Math.random()*23)].e,name:PRODUCTS[Math.floor(Math.random()*23)].n,val:'Produit offert !',type:'product'};
+    if(roll<0.7)return {icon:'🏷️',name:'Réduction -10%',val:'Sur votre prochain achat',type:'discount'};
+    return {icon:'⭐',name:'Points Bonus x2',val:'Sur votre prochain achat',type:'points'};
+  } else if(achat>=20){
+    if(roll<0.25)return {icon:PRODUCTS[Math.floor(Math.random()*23)].e,name:PRODUCTS[Math.floor(Math.random()*23)].n,val:'Produit offert !',type:'product'};
+    if(roll<0.6)return {icon:'🏷️',name:'Réduction -5%',val:'Sur votre prochain achat',type:'discount'};
+    return {icon:'⭐',name:'Points Bonus +10',val:'Crédités sur votre carte',type:'points'};
+  } else {
+    if(roll<0.1)return {icon:PRODUCTS[Math.floor(Math.random()*10)+20].e,name:PRODUCTS[Math.floor(Math.random()*10)+20].n,val:'Produit offert !',type:'product'};
+    if(roll<0.5)return {icon:'🏷️',name:'Réduction -5%',val:'Sur votre prochain achat',type:'discount'};
+    return {icon:'⭐',name:'Points Bonus +5',val:'Crédités sur votre carte',type:'points'};
+  }
+}
+function initScratch(){
+  const canvas=document.getElementById('scratchCanvas');
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,280,160);
+  // Silver scratch layer with pattern
+  const grad=ctx.createLinearGradient(0,0,280,160);
+  grad.addColorStop(0,'#c0c0c0');grad.addColorStop(.5,'#e8e8e8');grad.addColorStop(1,'#a0a0a0');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,280,160);
+  // texture dots
+  for(let i=0;i<80;i++){
+    ctx.beginPath();ctx.arc(Math.random()*280,Math.random()*160,Math.random()*3,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.3)';ctx.fill();
+  }
+  ctx.font='bold 22px sans-serif';ctx.fillStyle='rgba(100,100,100,0.6)';
+  ctx.textAlign='center';ctx.fillText('GRATTEZ ICI',140,75);ctx.fillText('🎰',140,110);
+  // scratch events
+  let scratching=false,revealed=false,pct=0;
+  function getPos(e){
+    const r=canvas.getBoundingClientRect();
+    if(e.touches)return{x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};
+    return{x:e.clientX-r.left,y:e.clientY-r.top};
+  }
+  function scratch(e){
+    e.preventDefault();
+    const {x,y}=getPos(e);
+    ctx.globalCompositeOperation='destination-out';
+    ctx.beginPath();ctx.arc(x,y,22,0,Math.PI*2);ctx.fill();
+    // check % revealed
+    const data=ctx.getImageData(0,0,280,160).data;
+    let transparent=0;
+    for(let i=3;i<data.length;i+=4)if(data[i]<128)transparent++;
+    pct=transparent/(280*160)*100;
+    if(pct>45&&!revealed){revealed=true;revealPrize()}
+  }
+  canvas.onmousedown=e=>{scratching=true;scratch(e)};
+  canvas.onmousemove=e=>{if(scratching)scratch(e)};
+  canvas.onmouseup=()=>scratching=false;
+  canvas.ontouchstart=e=>scratch(e);
+  canvas.ontouchmove=e=>scratch(e);
+}
+function revealPrize(){
+  const canvas=document.getElementById('scratchCanvas');
+  const ctx=canvas.getContext('2d');
+  ctx.globalCompositeOperation='destination-out';
+  ctx.fillRect(0,0,280,160);
+  const c=C.find(x=>x.id===scratchClientId);
+  if(c){c.scratchAvail=false;save();}
+  setTimeout(()=>{
+    document.getElementById('scratch-modal').style.display='none';
+    voirClient();
+  },3000);
+}
+function closeScratch(){
+  const c=C.find(x=>x.id===scratchClientId);
+  if(c){c.scratchAvail=false;save();}
+  document.getElementById('scratch-modal').style.display='none';
+  voirClient();
+}
+
+// ═══════════════════════════════════════
+// EMAILS
+// ═══════════════════════════════════════
+function afficherEmails(){
+  const el=document.getElementById('email-list');
+  const withEmail=C.filter(c=>c.email);
+  if(!withEmail.length){el.innerHTML='<div class="empty-msg">Aucun client avec email pour l\'instant.</div>';return}
+  el.innerHTML=withEmail.map(c=>{
+    const nv=niv(c.pts);
+    return `<div class="hist-row">
+      <div><span style="font-weight:600">${c.prenom} ${c.nom}</span> ${nv.l?`<span class="bdg ${nv.cls}">${nv.l}</span>`:''}<div style="font-size:12px;color:var(--mu)">${c.email}</div></div>
+      <span style="font-size:13px;color:var(--g);font-weight:700">${c.pts} pts</span>
+    </div>`;
+  }).join('');
+  // Update preview
+  const sel=document.getElementById('email-target');
+  if(sel)previewEmail();
+}
+function previewEmail(){
+  const sel=document.getElementById('email-target').value;
+  let liste=C.filter(c=>c.email);
+  if(sel!=='all')liste=liste.filter(c=>c.pts>=parseInt(sel));
+  document.getElementById('email-preview').textContent=liste.length+' destinataire(s) concerné(s)';
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const sel=document.getElementById('email-target');
+  if(sel)sel.onchange=previewEmail;
+});
+function envoyerEmails(){
+  const sel=document.getElementById('email-target').value;
+  const sujet=document.getElementById('email-sujet').value.trim();
+  const body=document.getElementById('email-body').value.trim();
+  if(!sujet||!body){alert('Veuillez remplir le sujet et le message.');return}
+  let liste=C.filter(c=>c.email);
+  if(sel!=='all')liste=liste.filter(c=>c.pts>=parseInt(sel));
+  if(!liste.length){alert('Aucun destinataire avec email dans cette catégorie.');return}
+  const emails=liste.map(c=>c.email).join(',');
+  const mailto=`mailto:${emails}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(body)}`;
+  window.open(mailto);
+}
+
+// ═══════════════════════════════════════
+// QR PARAM ON LOAD
+// ═══════════════════════════════════════
+function checkQRParam(){
+  const params=new URLSearchParams(window.location.search);
+  const cid=params.get('client');
+  if(cid){
+    // Show client view directly
+    const c=C.find(x=>x.id===cid);
+    if(c){
+      document.getElementById('pin-screen').style.display='none';
+      document.getElementById('app').style.display='block';
+      // Switch to client tab
+      document.querySelectorAll('.tab').forEach((t,i)=>{
+        t.classList.toggle('on',i===1);
+      });
+      document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+      document.getElementById('pane-client').classList.add('on');
+      document.getElementById('c-search').value=c.prenom+' '+c.nom;
+      voirClient();
+    }
+  }
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+window.onload=function(){
+  loadAll();
+  checkQRParam();
+};
+</script>
+</body>
+</html>
