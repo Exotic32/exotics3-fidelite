@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Exotics 3 Frontières — Ma Carte Fidélité</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#2E8B2E;--gd:#1a5e1a;--gl:#e8f5e8;--y:#F5D000;--yd:#b89e00;--yl:#fffbe6}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f6f3;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1rem}
+.header{background:var(--g);border-radius:14px;padding:14px 20px;margin-bottom:20px;width:100%;max-width:480px;display:flex;align-items:center;gap:12px}
+.hlogo{width:46px;height:46px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:var(--gd);flex-shrink:0}
+.htitle{font-size:17px;font-weight:700;color:var(--y)}
+.hsub{font-size:11px;color:rgba(255,255,255,.8)}
+.box{background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:14px;padding:20px;width:100%;max-width:480px;margin-bottom:14px}
+.boxtitle{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(0,0,0,.08)}
+input{width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:10px;font-size:15px;background:#fff;color:#1a1a1a;margin-bottom:10px}
+input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 3px rgba(46,139,46,.1)}
+.btn{width:100%;padding:13px;border-radius:10px;border:none;background:var(--g);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--gd)}
+.empty-msg{text-align:center;color:#888;padding:1.5rem 0;font-size:14px}
+/* Carte */
+.fcard{background:var(--g);border-radius:16px;padding:22px;color:#fff;margin-bottom:14px;position:relative;overflow:hidden}
+.fcard-deco{position:absolute;border-radius:50%;background:rgba(245,208,0,.1)}
+.fcard-brand{font-size:12px;font-weight:700;color:var(--y);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase}
+.fcard-name{font-size:22px;font-weight:700;margin-bottom:2px}
+.fcard-tel{font-size:12px;opacity:.75;margin-bottom:16px}
+.fcard-pts{font-size:40px;font-weight:800;color:var(--y);line-height:1}
+.fcard-ptslbl{font-size:12px;opacity:.8}
+.fcard-lvl{position:absolute;top:16px;right:16px;background:rgba(245,208,0,.22);border:1px solid rgba(245,208,0,.45);border-radius:99px;padding:3px 12px;font-size:11px;font-weight:700;color:var(--y)}
+.bar-bg{background:rgba(255,255,255,.2);border-radius:99px;height:8px;overflow:hidden;margin:8px 0 4px}
+.bar-f{height:100%;border-radius:99px;background:var(--y);transition:width .4s}
+.bar-labels{display:flex;justify-content:space-between;font-size:11px;opacity:.8}
+.rwd-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.07);font-size:14px}
+.rwd-row:last-child{border-bottom:none}
+.hist-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.07);font-size:13px}
+.hist-row:last-child{border-bottom:none}
+.plus{color:var(--g);font-weight:700}.minus{color:#e24b4a;font-weight:700}
+.bdg{display:inline-block;font-size:11px;padding:2px 7px;border-radius:6px;font-weight:700;margin-left:5px}
+.bdg-s{background:#e0e0d8;color:#444}.bdg-o{background:#fde8b0;color:#7a4f00}.bdg-p{background:var(--gl);color:var(--gd)}
+/* Scratch */
+.scratch-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem}
+.scratch-box{background:#fff;border-radius:20px;padding:24px;max-width:360px;width:100%;text-align:center}
+.scratch-title{font-size:20px;font-weight:800;color:var(--gd);margin-bottom:4px}
+.scratch-sub{font-size:13px;color:#888;margin-bottom:18px}
+.scratch-card{position:relative;width:280px;height:160px;margin:0 auto 18px;border-radius:14px;overflow:hidden;cursor:crosshair}
+.scratch-prize{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--gl),#fff);z-index:1}
+.scratch-prize-icon{font-size:40px;margin-bottom:6px}
+.scratch-prize-txt{font-size:16px;font-weight:800;color:var(--gd)}
+.scratch-prize-val{font-size:13px;color:#888;margin-top:3px}
+canvas#scratchCanvas{position:absolute;inset:0;z-index:2;border-radius:14px}
+.info-banner{background:var(--yl);border:1px solid var(--yd);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--gd);margin-bottom:10px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="hlogo">E3</div>
+  <div>
+    <div class="htitle">Exotics 3 Frontières</div>
+    <div class="hsub">Épicerie · Cosmétiques · Gros · Demi-gros · Détail</div>
+  </div>
+</div>
+
+<div class="box" id="search-box">
+  <div class="boxtitle">🔍 Ma carte fidélité</div>
+  <input type="text" id="c-search" placeholder="Mon prénom ou nom..." oninput="voirClient()"/>
+  <input type="tel" id="c-tel" placeholder="Ou mon numéro de téléphone..." oninput="voirClient()"/>
+  <div class="info-banner">📱 Entrez votre nom ou téléphone pour accéder à votre carte</div>
+</div>
+
+<div id="carte-client" style="width:100%;max-width:480px">
+  <div class="empty-msg">Bienvenue ! Entrez votre nom ou téléphone ci-dessus.</div>
+</div>
+
+<!-- SCRATCH -->
+<div id="scratch-modal" style="display:none" class="scratch-overlay">
+  <div class="scratch-box">
+    <div class="scratch-title">🎰 Carte à Gratter</div>
+    <div class="scratch-sub">Grattez pour découvrir votre gain !</div>
+    <div class="scratch-card">
+      <div class="scratch-prize" id="scratch-prize">
+        <div class="scratch-prize-icon" id="sp-icon">🎁</div>
+        <div class="scratch-prize-txt" id="sp-txt">...</div>
+        <div class="scratch-prize-val" id="sp-val"></div>
+      </div>
+      <canvas id="scratchCanvas" width="280" height="160"></canvas>
+    </div>
+    <button style="width:100%;padding:11px;border-radius:10px;border:none;background:var(--g);color:#fff;font-size:15px;font-weight:700;cursor:pointer" onclick="closeScratch()">Fermer</button>
+  </div>
+</div>
+
+<script>
+let C=[];
+let scratchClientId=null;
+
+const PRODUCTS=[
+  {n:'Plantain Tournant Jaune',e:'🍌'},{n:'Piment Frais',e:'🌶️'},{n:'Gombo Frais',e:'🫛'},
+  {n:'Chips Plantain',e:'🍟'},{n:'Attiéké Frais',e:'🍚'},{n:'Arachide Fraîche',e:'🥜'},
+  {n:'Bobolo',e:'🟤'},{n:'Safou',e:'🫐'},{n:'Bar du Sénégal',e:'🐟'},
+  {n:'Manioc Frais',e:'🥔'},{n:'Igname Blanc',e:'🥕'},{n:'Aubergine Blanche',e:'🍆'},
+  {n:'Plantain Vert',e:'🍌'},{n:'Vimto 33cl',e:'🥤'},{n:'Malta Guinness',e:'🍺'},
+  {n:'Avocat',e:'🥑'},{n:'Jus de Gingembre',e:'🫚'},{n:'Saka Saka',e:'🥬'},
+  {n:'Maquereau 500g',e:'🐡'},{n:'Piment Antillais',e:'🌶️'},
+];
+
+function load(){
+  try{const r=localStorage.getItem('e3c');if(r)C=JSON.parse(r)}catch(e){}
+}
+
+function niv(pts){
+  if(pts>=500)return{l:'Platine',cls:'bdg-p',icon:'💎'};
+  if(pts>=200)return{l:'Or',cls:'bdg-o',icon:'🥇'};
+  if(pts>=100)return{l:'Argent',cls:'bdg-s',icon:'🥈'};
+  return{l:'',cls:'',icon:''};
+}
+function nextNiv(pts){
+  if(pts<100)return{t:100,l:'Argent'};
+  if(pts<200)return{t:200,l:'Or'};
+  if(pts<500)return{t:500,l:'Platine'};
+  return null;
+}
+
+function voirClient(){
+  const q1=(document.getElementById('c-search').value||'').trim().toLowerCase();
+  const q2=(document.getElementById('c-tel').value||'').trim();
+  const el=document.getElementById('carte-client');
+  if(!q1&&!q2){el.innerHTML='<div class="empty-msg">Bienvenue ! Entrez votre nom ou téléphone.</div>';return}
+  const c=C.find(x=>{
+    const nom=(x.prenom+' '+x.nom).toLowerCase();
+    return (q1&&nom.includes(q1))||(q2&&(x.tel||'').includes(q2));
+  });
+  if(!c){el.innerHTML='<div class="empty-msg">Aucun compte trouvé.<br>Demandez à votre commerçant de vous inscrire !</div>';return}
+  const nv=niv(c.pts);
+  const nx=nextNiv(c.pts);
+  const prev=nx?(nx.t===100?0:nx.t===200?100:200):500;
+  const pct=nx?Math.round(Math.min(((c.pts-prev)/(nx.t-prev))*100,100)):100;
+  const hist=(c.hist||[]).slice(0,5);
+  const scratchBtn=c.scratchAvail
+    ?`<button style="width:100%;padding:13px;margin-top:12px;border-radius:10px;border:none;background:var(--y);color:var(--gd);font-size:15px;font-weight:800;cursor:pointer" onclick="ouvrirScratch('${c.id}')">🎰 Gratter ma carte !</button>`
+    :'<div style="text-align:center;font-size:13px;color:#888;margin-top:10px;padding:8px;background:#f5f5f5;border-radius:8px">🎰 Jeu à gratter disponible dès 10€ d\'achat</div>';
+  el.innerHTML=`
+    <div class="fcard">
+      <div class="fcard-deco" style="width:120px;height:120px;bottom:-20px;right:-20px"></div>
+      <div class="fcard-deco" style="width:65px;height:65px;bottom:25px;right:45px"></div>
+      <div class="fcard-brand">✦ Exotics 3 Frontières ✦</div>
+      <div class="fcard-name">${c.prenom} ${c.nom}</div>
+      <div class="fcard-tel">${c.tel||'Client fidèle'}</div>
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <div class="fcard-pts">${c.pts}</div>
+        <div class="fcard-ptslbl">points</div>
+      </div>
+      ${nv.l?`<div class="fcard-lvl">${nv.icon} ${nv.l}</div>`:''}
+      <div class="bar-bg"><div class="bar-f" style="width:${pct}%"></div></div>
+      <div class="bar-labels"><span>${c.pts} pts</span><span>${nx?nx.t+' pts ('+nx.l+')':'Niveau max !'}</span></div>
+    </div>
+    <div class="box">
+      <div class="boxtitle">🏆 Mes récompenses</div>
+      <div class="rwd-row"><span>🥈 100 pts</span><span style="color:#888">Réduction 5%</span></div>
+      <div class="rwd-row"><span>🥇 200 pts</span><span style="color:#888">Réduction 10%</span></div>
+      <div class="rwd-row"><span>💎 500 pts</span><span style="color:#888">Produit offert</span></div>
+      ${scratchBtn}
+    </div>
+    ${hist.length?`<div class="box"><div class="boxtitle">📋 Mon historique</div>${hist.map(h=>`<div class="hist-row"><span>${h.l}</span><div style="display:flex;gap:8px"><span class="${h.pts>0?'plus':'minus'}">${h.pts>0?'+':''}${h.pts} pts</span><span style="font-size:11px;color:#888">${h.d}</span></div></div>`).join('')}</div>`:''}
+  `;
+}
+
+function ouvrirScratch(id){
+  scratchClientId=id;
+  const c=C.find(x=>x.id===id);
+  if(!c||!c.scratchAvail)return;
+  const achat=c.lastAchat||10;
+  const prize=pickPrize(achat);
+  document.getElementById('sp-icon').textContent=prize.icon;
+  document.getElementById('sp-txt').textContent=prize.name;
+  document.getElementById('sp-val').textContent=prize.val;
+  initScratch();
+  document.getElementById('scratch-modal').style.display='flex';
+}
+
+function pickPrize(achat){
+  const roll=Math.random();
+  const p=PRODUCTS[Math.floor(Math.random()*PRODUCTS.length)];
+  if(achat>=30){
+    if(roll<0.4)return{icon:p.e,name:p.n,val:'Produit offert !'};
+    if(roll<0.7)return{icon:'🏷️',name:'Réduction -10%',val:'Sur votre prochain achat'};
+    return{icon:'⭐',name:'Points Bonus x2',val:'Sur votre prochain achat'};
+  }else if(achat>=20){
+    if(roll<0.25)return{icon:p.e,name:p.n,val:'Produit offert !'};
+    if(roll<0.6)return{icon:'🏷️',name:'Réduction -5%',val:'Sur votre prochain achat'};
+    return{icon:'⭐',name:'Points Bonus +10',val:'Crédités sur votre carte'};
+  }else{
+    if(roll<0.1)return{icon:p.e,name:p.n,val:'Produit offert !'};
+    if(roll<0.5)return{icon:'🏷️',name:'Réduction -5%',val:'Sur votre prochain achat'};
+    return{icon:'⭐',name:'Points Bonus +5',val:'Crédités sur votre carte'};
+  }
+}
+
+function initScratch(){
+  const canvas=document.getElementById('scratchCanvas');
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,280,160);
+  const grad=ctx.createLinearGradient(0,0,280,160);
+  grad.addColorStop(0,'#c0c0c0');grad.addColorStop(.5,'#e8e8e8');grad.addColorStop(1,'#a0a0a0');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,280,160);
+  for(let i=0;i<80;i++){
+    ctx.beginPath();ctx.arc(Math.random()*280,Math.random()*160,Math.random()*3,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.3)';ctx.fill();
+  }
+  ctx.font='bold 20px sans-serif';ctx.fillStyle='rgba(80,80,80,0.7)';
+  ctx.textAlign='center';ctx.fillText('🎰 GRATTEZ ICI',140,80);
+  let scratching=false,revealed=false;
+  function getPos(e){
+    const r=canvas.getBoundingClientRect();
+    if(e.touches)return{x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};
+    return{x:e.clientX-r.left,y:e.clientY-r.top};
+  }
+  function scratch(e){
+    e.preventDefault();
+    const{x,y}=getPos(e);
+    ctx.globalCompositeOperation='destination-out';
+    ctx.beginPath();ctx.arc(x,y,25,0,Math.PI*2);ctx.fill();
+    const data=ctx.getImageData(0,0,280,160).data;
+    let t=0;for(let i=3;i<data.length;i+=4)if(data[i]<128)t++;
+    if(t/(280*160)*100>45&&!revealed){revealed=true;revealPrize();}
+  }
+  canvas.onmousedown=e=>{scratching=true;scratch(e)};
+  canvas.onmousemove=e=>{if(scratching)scratch(e)};
+  canvas.onmouseup=()=>scratching=false;
+  canvas.ontouchstart=e=>scratch(e);
+  canvas.ontouchmove=e=>scratch(e);
+}
+
+function revealPrize(){
+  const canvas=document.getElementById('scratchCanvas');
+  const ctx=canvas.getContext('2d');
+  ctx.globalCompositeOperation='destination-out';
+  ctx.fillRect(0,0,280,160);
+  const c=C.find(x=>x.id===scratchClientId);
+  if(c){c.scratchAvail=false;localStorage.setItem('e3c',JSON.stringify(C));}
+  setTimeout(()=>{closeScratch();voirClient();},3000);
+}
+
+function closeScratch(){
+  const c=C.find(x=>x.id===scratchClientId);
+  if(c){c.scratchAvail=false;localStorage.setItem('e3c',JSON.stringify(C));}
+  document.getElementById('scratch-modal').style.display='none';
+  voirClient();
+}
+
+load();
+</script>
+</body>
+</html>
